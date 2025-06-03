@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-image: url(https://img.freepik.com/premium-vector/illustration-online-vote-with-computer-ballot-box_24877-59608.jpg?w=1380);
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            color: white;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 100vw;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 900;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar {
+            width: 320px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            color: white;
+            position: fixed;
+            left: -320px;
+            top: 0;
+            padding-top: 30px;
+            transition: left 0.4s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.7);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            margin-left: 20px;
+            margin-right: 20px;
+            padding: 15px;
+            text-decoration: none;
+            color: white;
+            font-size: 20px;
+            background-color: rgba(90, 77, 101, 0.8);
+            border: 1px solid #333;
+            border-radius: 1rem;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .sidebar.open a {
+            opacity: 1;
+            transform: translateX(0);
+            transition-delay: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .sidebar a .icon {
+            margin-right: 10px;
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-left: 0;
+            transition: margin-left 0.4s ease, filter 0.4s ease;
+            text-align: center;
+            position: relative;
+            top:150px;
+            z-index: 1;
+        }
+
+        .main-content.shift {
+            margin-left: 250px;
+            filter: blur(2px);
+        }
+
+        .hamburger {
+            font-size: 40px;
+            color: white;
+            padding: 10px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1100;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .hamburger:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 2.5em;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .container h1 {
+            margin-bottom: 1.5em;
+            font-size: 2rem;
+        }
+
+        .info, .actions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 1.5em;
+            color: white;
+        }
+
+        .info p {
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 15px;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            transition: background 0.3s;
+            font-size: 1rem;
+        }
+
+        .update-btn {
+            background-color: #28a745;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+        }
+
+        .update-btn:hover {
+            background-color: #218838;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px;
+            }
+            .main-content.shift {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+<div class="sidebar" id="sidebar">
+    <a href="/Home"><span class="icon">🏠</span>Home</a>
+    <a href="/loginApi"><span class="icon">👤</span>Admin Login</a>
+    <a href="/voter"><span class="icon">📝</span>Voter Signup</a>
+    <a href="/Vlogin"><span class="icon">🔑</span>Voter Login</a>
+    <a href="/welcomepage"><span class="icon">📋</span>Admin Dashboard</a>
+</div>
+
+<div class="main-content" id="main-content">
+    <div class="container">
+        <h1>Admin Details</h1>
+        <div class="info">
+            <p><strong>Name:</strong> <span th:text="${admin.username}">John Doe</span></p>
+            <p><strong>Date of Birth:</strong> <span th:text="${admin.dob}">1990-01-01</span></p>
+            <p><strong>Gender:</strong> <span th:text="${admin.gender}">Male</span></p>
+            <p><strong>Email:</strong> <span th:text="${admin.email}">john.doe@example.com</span></p>
+            <p><strong>Address:</strong> <span th:text="${admin.address}">123 Main St</span></p>
+        </div>
+        <div class="actions">
+            <a href="/updatePage" class="btn update-btn">Update</a>
+            <a href="/deleteVoter" class="btn delete-btn" onclick="return confirmDelete()">Delete</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const overlay = document.getElementById('overlay');
+
+        sidebar.classList.toggle('open');
+        mainContent.classList.toggle('shift');
+        overlay.classList.toggle('active');
+    }
+
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this profile?');
+    }
+</script>
+
+</body>
+</html>
