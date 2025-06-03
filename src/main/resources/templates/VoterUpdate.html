@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Edit Voter</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          margin: 0;
+          height: 100vh;
+          background: linear-gradient(-45deg, #1e539e, #ff3083, #7800a8, #1e539e);
+          background-size: 600% 600%;
+          animation: gradientShift 15s ease infinite;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+        }
+
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .container {
+          backdrop-filter: blur(10px);
+          background-color: rgba(255, 255, 255, 0.2);
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          padding: 35px;
+          width: 100%;
+          max-width: 500px;
+          color: #fff;
+          animation: fadeInUp 1s ease forwards;
+          opacity: 0;
+          transform: translateY(30px);
+        }
+
+        @keyframes fadeInUp {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        h1 {
+          text-align: center;
+          font-size: 2rem;
+          margin-bottom: 30px;
+          color: #fff;
+        }
+
+        label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #eaeaea;
+          text-align: left;
+        }
+
+        input, select {
+          width: 100%;
+          padding: 12px 14px;
+          border: none;
+          border-radius: 10px;
+          font-size: 1rem;
+          background-color: rgba(255, 255, 255, 0.15);
+          color: #fff;
+          outline: none;
+          box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.1);
+          transition: all 0.3s ease;
+          margin-bottom: 20px;
+        }
+
+        input::placeholder {
+          color: #ddd;
+        }
+
+        input:focus, select:focus {
+          background-color: rgba(255, 255, 255, 0.25);
+          box-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50;
+        }
+
+        .btn-group {
+          display: flex;
+          justify-content: space-between;
+          gap: 15px;
+        }
+
+        .btn {
+          background-color: #4CAF50;
+          color: white;
+          padding: 14px;
+          width: 100%;
+          border: none;
+          border-radius: 10px;
+          font-weight: bold;
+          font-size: 1.1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          text-decoration: none;
+          text-align: center;
+        }
+
+        .btn:hover {
+          background-color: #43a047;
+          transform: scale(1.02);
+        }
+
+        .btn::after {
+          content: '';
+          position: absolute;
+          background: rgba(255, 255, 255, 0.4);
+          border-radius: 50%;
+          transform: scale(0);
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          opacity: 0;
+          transition: transform 0.4s, opacity 0.8s;
+          pointer-events: none;
+        }
+
+        .btn:active::after {
+          transform: scale(2);
+          opacity: 1;
+          transition: 0s;
+        }
+
+        @media (max-width: 480px) {
+          .container {
+            padding: 25px;
+            width: 90%;
+          }
+
+          h1 {
+            font-size: 1.5rem;
+          }
+
+          .btn-group {
+            flex-direction: column;
+          }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Edit Voter</h1>
+    <form action="/updateVoter" th:object="${voter}" method="post">
+        <input type="hidden" th:field="*{id}">
+
+        <label for="voterName">Name:</label>
+        <input type="text" id="voterName" th:field="*{voterName}" required minlength="4" maxlength="8" pattern="[A-Za-z]+" title="Only characters are allowed" placeholder="Enter name">
+
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" th:field="*{dob}" required>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" th:field="*{gender}" required>
+            <option value="Male" th:selected="${voter.gender == 'Male'}">Male</option>
+            <option value="Female" th:selected="${voter.gender == 'Female'}">Female</option>
+            <option value="Other" th:selected="${voter.gender == 'Other'}">Other</option>
+        </select>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" th:field="*{username}" required placeholder="Username">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" th:field="*{email}" required placeholder="Email">
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" th:field="*{password}" required placeholder="Password">
+
+        <div class="btn-group">
+            <button type="submit" class="btn">Update</button>
+            <a href="/voterList" class="btn" style="background-color: #777;">Back to List</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

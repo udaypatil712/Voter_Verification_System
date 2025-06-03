@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Voter</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          background-image: url(https://img.freepik.com/premium-vector/illustration-online-vote-with-computer-ballot-box_24877-59608.jpg?w=1380);
+            background-size: cover;
+          background-position: center;
+          height: 100vh;
+          color: white;
+
+        }
+
+        .overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100vh;
+          width: 100vw;
+          background: rgba(0, 0, 0, 0.5);
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s ease;
+          z-index: 900;
+        }
+
+        .overlay.active {
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        .hamburger {
+          position: fixed;
+          top: 15px;
+          left: 15px;
+          z-index: 1100;
+          background: rgba(0, 0, 0, 0.5);
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          font-size: 32px;
+          color: white;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+        }
+
+        .hamburger:hover {
+          background: rgba(0, 0, 0, 0.7);
+        }
+
+        .sidebar {
+          width: 320px;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(12px);
+          position: fixed;
+          left: -320px;
+          top: 0;
+          transition: left 0.4s ease;
+          z-index: 1000;
+          box-shadow: 2px 0 10px rgba(0, 0, 0, 0.7);
+          padding-top: 30px;
+        }
+
+        .sidebar.open {
+          left: 0;
+        }
+
+        .sidebar a {
+          display: block;
+          padding: 15px 20px;
+          margin: 15px;
+          background-color: rgba(90, 77, 101, 0.8);
+          color: white;
+          text-decoration: none;
+          border-radius: 12px;
+          font-size: 18px;
+          transition: all 0.3s ease;
+        }
+
+        .sidebar a:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+          transform: scale(1.05);
+        }
+
+        .main-content {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          padding: 20px;
+          transition: margin-left 0.4s ease;
+        }
+
+        .main-content.shift {
+          margin-left: 250px;
+          filter: blur(2px);
+        }
+
+        .container {
+          background: rgba(0, 0, 0, 0.65);
+          padding: 30px;
+          border-radius: 15px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+          max-width: 500px;
+          width: 100%;
+        }
+
+        .container h1 {
+          text-align: center;
+          margin-bottom: 1em;
+        }
+
+        .form-group {
+          margin-bottom: 1.25em;
+        }
+
+        label {
+          display: block;
+          margin-bottom: 0.5em;
+        }
+
+        input, select {
+          width: 100%;
+          padding: 10px;
+          border-radius: 8px;
+          border: none;
+          font-size: 1em;
+          color: #000;
+        }
+
+        .form-group .error {
+          color: #ff6b6b;
+          font-size: 0.85em;
+          margin-top: 5px;
+        }
+
+        .button-container {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap;
+          justify-content: center;
+
+        }
+
+        .btn {
+          background: #4CAF50;
+          border: none;
+          padding: 0.9em 1.2em;
+          font-size: 1em;
+          color: white;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.3s ease;
+        }
+
+        .btn.secondary {
+          background: #f44336;
+        }
+
+        .btn:hover {
+          background-color: #45a049;
+        }
+
+        .btn.secondary:hover {
+          background-color: #d32f2f;
+        }
+
+        @media (max-width: 768px) {
+          .sidebar {
+            width: 260px;
+          }
+
+          .main-content.shift {
+            margin-left: 0;
+          }
+
+          .container {
+            width: 90%;
+          }
+
+          .button-container {
+            flex-direction: column;
+          }
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="hamburger" onclick="toggleSidebar()">☰</div>
+
+<div class="sidebar" id="sidebar">
+    <a href="/Home">🏠 Home</a>
+    <a href="/loginApi">👤 Admin Login</a>
+    <a href="/voter">📝 Voter Signup</a>
+    <a href="/Vlogin">🔑 Voter Login</a>
+</div>
+
+<div class="main-content" id="main-content">
+    <div class="container">
+        <h1>Add New Voter</h1>
+        <form action="/votersignup" th:object="${voter}" method="post" id="voterForm">
+            <div class="form-group">
+                <label for="voterName">Name:</label>
+                <input type="text" id="voterName" th:field="*{voterName}" required pattern="[A-Za-z]{4,8}" title="Only 4-8 characters allowed.">
+                <span class="error" id="voterNameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" th:field="*{dob}" required>
+                <span class="error" id="dobError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" th:field="*{gender}" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                <span class="error" id="genderError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" th:field="*{username}" required>
+                <span class="error" id="usernameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" th:field="*{email}" required>
+                <span class="error" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" th:field="*{password}" required>
+                <span class="error" id="passwordError"></span>
+            </div>
+
+            <div class="button-container">
+                <button type="submit" class="btn">Save</button>
+                <a style="text-decoration: none;" href="/voterlogin" class="btn secondary">Back to List</a>
+                <a style="text-decoration: none;" href="/Vlogin" class="btn">Login Here</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('main-content').classList.toggle('shift');
+      document.getElementById('overlay').classList.toggle('active');
+    }
+
+    document.getElementById('voterForm').addEventListener('submit', function (event) {
+      let isValid = true;
+
+      const validate = (id, condition, message) => {
+        const el = document.getElementById(id);
+        const errorEl = document.getElementById(id + "Error");
+        if (!condition) {
+          errorEl.innerText = message;
+          isValid = false;
+        } else {
+          errorEl.innerText = "";
+        }
+      };
+
+      validate('voterName', /^[A-Za-z]{4,8}$/.test(voterName.value), "Name should be 4-8 letters only.");
+      validate('dob', dob.value, "Date of birth is required.");
+      validate('gender', gender.value, "Please select a gender.");
+      validate('username', username.value.trim(), "Username is required.");
+      validate('email', email.validity.valid, "Enter a valid email.");
+      validate('password', password.value.trim(), "Password is required.");
+
+      if (!isValid) event.preventDefault();
+    });
+</script>
+
+</body>
+</html>
